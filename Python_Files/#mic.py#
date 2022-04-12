@@ -1,0 +1,39 @@
+import sounddevice as sd
+import pyaudio
+import wave
+
+chunk = 1024
+sample_format = pyaudio.paInt16
+channels = 2
+fsr = 44100
+seconds = 3
+#sd.default.device = 'samson go mic'
+#sd.default.device = 2
+#myRecording = sd.rec(int(seconds*fsr), samplerate=fsr, channels=2)
+#sd.wait()
+#write('testAudio.wav', fsr, myRecording)
+
+p = pyaudio.PyAudio()
+stream = p.open(format=sample_format,
+                channels=channels,
+                rate=fsr,
+                frames_per_buffer=chunk,
+                input=True)
+frames = []
+for i in range(0,int(fsr/chunk*seconds)):
+    data = stream.read(chunk)
+    frames.append(data)
+
+stream.stop_stream()
+stream.close()
+p.terminate()
+
+wf = wave.open('testaudio.wav', 'wb')
+wf.setnchannels(channels)
+wf.setsamplewidth(p.get_sample_size(sample_format))
+wf.setframerate(fsr)
+wf.writeframes(b''.join(frames))
+wf.close
+
+
+
